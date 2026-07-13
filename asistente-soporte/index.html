@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asistente de Soporte con IA · Emiliano H. Sierra</title>
+  <title>AI Reply · Asistente IA para Atención al Cliente</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -11,36 +11,51 @@
 </head>
 <body>
 
-  <!-- Formas decorativas de fondo (efecto IA) -->
+  <!-- Formas decorativas de fondo -->
   <div class="deco deco-1" aria-hidden="true"></div>
   <div class="deco deco-2" aria-hidden="true"></div>
 
-  <!-- Botón de modo oscuro -->
-  <button id="btnTema" class="btn-tema" onclick="cambiarTema()" title="Cambiar tema" aria-label="Cambiar tema claro u oscuro">🌙</button>
+  <!-- Barra superior con marca -->
+  <nav class="topbar">
+    <span class="marca">✨ AI Reply</span>
+    <button id="btnTema" class="btn-tema" onclick="cambiarTema()" title="Cambiar tema" aria-label="Cambiar tema claro u oscuro">🌙</button>
+  </nav>
 
   <header class="hero">
-    <span class="eyebrow">✨ Impulsado por Inteligencia Artificial</span>
-    <h1>¿En qué podemos ayudarte?</h1>
-    <p class="subtitulo">Pega el mensaje de un cliente y genera una respuesta profesional al instante.</p>
+    <span class="eyebrow">✨ Asistente IA para Atención al Cliente</span>
+    <h1>Responde a tus clientes con IA en segundos</h1>
+    <p class="subtitulo">Genera respuestas profesionales, empáticas y personalizadas para cualquier situación.</p>
+    <div class="badges">
+      <span class="badge-info">🌎 2 idiomas</span>
+      <span class="badge-info">🎭 4 tonos</span>
+      <span class="badge-info">⚡ Respuestas ilimitadas</span>
+    </div>
   </header>
 
   <main class="contenedor">
 
     <!-- Caja principal -->
     <section class="panel">
-      <label for="mensajeCliente">Mensaje del cliente</label>
-      <textarea id="mensajeCliente" rows="5" placeholder="Escribe tu pregunta..."></textarea>
+      <div class="campo-head">
+        <label for="mensajeCliente">Mensaje del cliente</label>
+        <div class="mini-acciones">
+          <button class="chip" onclick="pegarTexto()">📥 Pegar</button>
+          <button class="chip" onclick="limpiarTexto()">🧹 Limpiar</button>
+        </div>
+      </div>
+      <textarea id="mensajeCliente" rows="6" maxlength="1500" oninput="actualizarContador()" placeholder="Pega aquí el mensaje del cliente...&#10;&#10;Ej: &quot;Recibí un producto dañado y nadie responde mis correos.&quot;"></textarea>
+      <div class="contador"><span id="contador">0</span> / 1500 caracteres</div>
 
       <div class="opciones">
         <div class="campo">
-          <label for="idioma">Idioma</label>
+          <label for="idioma">🌎 Idioma</label>
           <select id="idioma">
             <option value="es">Español</option>
             <option value="en">Inglés</option>
           </select>
         </div>
         <div class="campo">
-          <label for="tono">Tono</label>
+          <label for="tono">🎭 Tono</label>
           <select id="tono">
             <option value="Formal">Formal</option>
             <option value="Amigable">Amigable</option>
@@ -49,7 +64,7 @@
           </select>
         </div>
         <div class="campo">
-          <label for="longitud">Longitud</label>
+          <label for="longitud">📏 Longitud</label>
           <select id="longitud">
             <option value="detallada">Detallada</option>
             <option value="breve">Breve</option>
@@ -57,31 +72,36 @@
         </div>
       </div>
 
-      <div class="botones-form">
-        <button id="btnGenerar" class="btn-primario" onclick="generarRespuesta()">Preguntar</button>
-        <button class="btn-secundario" onclick="limpiar()">Limpiar</button>
-      </div>
+      <button id="btnGenerar" class="btn-primario" onclick="generarRespuesta()">✨ Generar respuesta</button>
     </section>
 
-    <!-- Ejemplos rápidos (cuadrícula) -->
+    <!-- Plantillas rápidas -->
     <section class="ejemplos">
-      <h2 class="titulo-seccion">Ejemplos rápidos</h2>
+      <h2 class="titulo-seccion">Plantillas rápidas</h2>
       <div class="grid-ejemplos">
-        <button class="tarjeta-ejemplo" onclick="usarEjemplo('Mi vuelo se canceló y nadie me avisó. Necesito una solución urgente.')">
-          <span class="ej-icon">✈️</span>
-          <span class="ej-texto">Vuelo cancelado</span>
+        <button class="tarjeta-ejemplo" onclick="usarPlantilla('Mi vuelo fue cancelado y nadie me avisó. Necesito una solución urgente.')">
+          <span class="ej-icon">✈️</span><span class="ej-texto">Vuelo cancelado</span>
         </button>
-        <button class="tarjeta-ejemplo" onclick="usarEjemplo('Quiero solicitar el reembolso de mi compra, el producto llegó dañado.')">
-          <span class="ej-icon">💳</span>
-          <span class="ej-texto">Reembolso</span>
+        <button class="tarjeta-ejemplo" onclick="usarPlantilla('Quiero solicitar el reembolso de mi compra, el producto no cumplió lo prometido.')">
+          <span class="ej-icon">💳</span><span class="ej-texto">Reembolso</span>
         </button>
-        <button class="tarjeta-ejemplo" onclick="usarEjemplo('Llevo tres días esperando respuesta y nadie me ayuda. Estoy muy molesto.')">
-          <span class="ej-icon">😠</span>
-          <span class="ej-texto">Queja de servicio</span>
+        <button class="tarjeta-ejemplo" onclick="usarPlantilla('Recibí mi pedido dañado y nadie responde mis correos. Estoy muy frustrado.')">
+          <span class="ej-icon">📦</span><span class="ej-texto">Producto dañado</span>
         </button>
-        <button class="tarjeta-ejemplo" onclick="usarEjemplo('Tengo una duda sobre un cargo en mi factura que no reconozco.')">
-          <span class="ej-icon">🧾</span>
-          <span class="ej-texto">Duda de factura</span>
+        <button class="tarjeta-ejemplo" onclick="usarPlantilla('Llevo tres días esperando respuesta y nadie me ayuda. Esto es inaceptable.')">
+          <span class="ej-icon">😡</span><span class="ej-texto">Cliente molesto</span>
+        </button>
+        <button class="tarjeta-ejemplo" onclick="usarPlantilla('Tengo una duda sobre un cargo en mi factura que no reconozco.')">
+          <span class="ej-icon">📄</span><span class="ej-texto">Facturación</span>
+        </button>
+        <button class="tarjeta-ejemplo" onclick="usarPlantilla('Mi pedido lleva una semana de retraso y no tengo información del envío.')">
+          <span class="ej-icon">🚚</span><span class="ej-texto">Retraso de envío</span>
+        </button>
+        <button class="tarjeta-ejemplo" onclick="usarPlantilla('Quiero cancelar mi suscripción y asegurarme de que no me cobren de nuevo.')">
+          <span class="ej-icon">❌</span><span class="ej-texto">Cancelación</span>
+        </button>
+        <button class="tarjeta-ejemplo" onclick="usarPlantilla('Necesito una atención especial porque viajo con un adulto mayor con movilidad reducida.')">
+          <span class="ej-icon">⭐</span><span class="ej-texto">Solicitud especial</span>
         </button>
       </div>
     </section>
@@ -95,6 +115,7 @@
           <button class="btn-mini" onclick="generarRespuesta()">🔄 Regenerar</button>
         </div>
       </div>
+      <div class="divisor"></div>
       <div id="respuesta" class="respuesta"></div>
     </section>
 
@@ -110,7 +131,8 @@
   </main>
 
   <footer class="pie">
-    <p>Proyecto de Emiliano H. Sierra · <a href="https://emilianohsierra.netlify.app" target="_blank">Volver al portafolio</a></p>
+    <p class="pie-marca">✨ AI Reply · v2.0</p>
+    <p>Creado por Emiliano H. Sierra · <a href="https://emilianohsierra.netlify.app" target="_blank">Volver al portafolio</a></p>
   </footer>
 
   <script>
@@ -127,14 +149,33 @@
       tarjeta.classList.remove("oculto");
 
       if (mensaje === "") {
-        caja.textContent = "⚠️ Primero escribe o pega el mensaje del cliente.";
+        caja.innerHTML = "⚠️ Primero escribe o pega el mensaje del cliente.";
         return;
       }
 
       boton.disabled = true;
       boton.textContent = "Generando...";
-      // Indicador de carga elegante (tres puntitos animados)
-      caja.innerHTML = '<span class="puntos"><span></span><span></span><span></span></span>';
+
+      // Estado de carga "inteligente" (pasos + barra de progreso)
+      caja.innerHTML =
+        '<div class="pasos" id="pasos"></div>' +
+        '<div class="barra"><div class="barra-fill"></div></div>';
+      var pasos = [
+        "✨ Analizando el mensaje…",
+        "✔️ Detectando el idioma",
+        "✔️ Identificando la intención",
+        "✔️ Generando la respuesta…"
+      ];
+      pasos.forEach(function (p, i) {
+        setTimeout(function () {
+          var pd = document.getElementById("pasos");
+          if (!pd) return;   // la respuesta ya llegó
+          var linea = document.createElement("div");
+          linea.className = "paso";
+          linea.textContent = p;
+          pd.appendChild(linea);
+        }, i * 550);
+      });
 
       try {
         var res = await fetch("/.netlify/functions/generar-respuesta", {
@@ -144,12 +185,12 @@
         });
         var data = await res.json();
         mostrarRespuesta(data.respuesta);
-        guardarEnHistorial({ respuesta: data.respuesta, idioma: idioma, tono: tono });
+        guardarEnHistorial({ respuesta: data.respuesta, mensaje: mensaje, idioma: idioma, tono: tono });
       } catch (error) {
-        caja.textContent = "❌ Hubo un error de conexión. Intenta de nuevo.";
+        caja.innerHTML = "❌ Hubo un error de conexión. Intenta de nuevo.";
       } finally {
         boton.disabled = false;
-        boton.textContent = "Preguntar";
+        boton.textContent = "✨ Generar respuesta";
       }
     }
 
@@ -158,15 +199,39 @@
       caja.textContent = texto;
       var card = document.getElementById("tarjetaResultado");
       card.classList.remove("oculto");
-      // Reinicia la animación de aparición
       card.classList.remove("aparece");
       void card.offsetWidth;
       card.classList.add("aparece");
     }
 
-    function usarEjemplo(texto) {
+    // ===== Textarea: pegar, limpiar, contador, plantillas =====
+    async function pegarTexto() {
+      try {
+        var texto = await navigator.clipboard.readText();
+        var caja = document.getElementById("mensajeCliente");
+        caja.value = texto;
+        actualizarContador();
+        caja.focus();
+      } catch (e) {
+        alert("Tu navegador no permitió pegar automáticamente. Usa Ctrl + V.");
+      }
+    }
+
+    function limpiarTexto() {
+      var caja = document.getElementById("mensajeCliente");
+      caja.value = "";
+      actualizarContador();
+      caja.focus();
+    }
+
+    function actualizarContador() {
+      document.getElementById("contador").textContent = document.getElementById("mensajeCliente").value.length;
+    }
+
+    function usarPlantilla(texto) {
       var caja = document.getElementById("mensajeCliente");
       caja.value = texto;
+      actualizarContador();
       caja.focus();
     }
 
@@ -181,11 +246,12 @@
 
     function limpiar() {
       document.getElementById("mensajeCliente").value = "";
+      actualizarContador();
       document.getElementById("respuesta").textContent = "";
       document.getElementById("tarjetaResultado").classList.add("oculto");
     }
 
-    // ===== Historial (guardado en el navegador) =====
+    // ===== Historial =====
     function guardarEnHistorial(item) {
       var historial = JSON.parse(localStorage.getItem("historial") || "[]");
       historial.unshift(item);
