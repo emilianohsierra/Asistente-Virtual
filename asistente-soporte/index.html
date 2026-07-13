@@ -178,7 +178,7 @@
       });
 
       try {
-        var res = await fetch("/.netlify/functions/generar-respuesta", {
+        var res = await fetch("/api/generar-respuesta", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ mensaje: mensaje, idioma: idioma, tono: tono, longitud: longitud })
