@@ -1,15 +1,29 @@
 /* ============================================================
-   ASISTENTE DE SOPORTE CON IA · Estilos
+   ASISTENTE DE SOPORTE CON IA · Estilos (v2, con modo oscuro)
    ============================================================ */
 
+/* --- Tema CLARO (por defecto) --- */
 :root {
-  --fondo:        #f8fafc;
+  --fondo:        #f1f5f9;
   --tarjeta:      #ffffff;
+  --input:        #ffffff;
   --texto:        #0f172a;
   --texto-suave:  #475569;
   --acento:       #2563eb;
   --acento-oscuro:#1d4ed8;
   --borde:        #e2e8f0;
+  --sombra: 0 1px 3px rgba(15, 23, 42, 0.06), 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+/* --- Tema OSCURO (se activa con la clase .tema-oscuro en el body) --- */
+body.tema-oscuro {
+  --fondo:        #0f172a;
+  --tarjeta:      #1e293b;
+  --input:        #0f172a;
+  --texto:        #f1f5f9;
+  --texto-suave:  #94a3b8;
+  --borde:        #334155;
+  --sombra: 0 1px 3px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.35);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,41 +33,50 @@ body {
   background-color: var(--fondo);
   color: var(--texto-suave);
   line-height: 1.6;
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s, color 0.3s;   /* cambio suave de tema */
 }
+
+/* --- Botón de modo oscuro (fijo, esquina superior derecha) --- */
+.btn-tema {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--borde);
+  background: var(--tarjeta);
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: var(--sombra);
+  z-index: 20;
+  transition: transform 0.2s;
+}
+.btn-tema:hover { transform: scale(1.08); }
 
 /* --- Encabezado --- */
-.encabezado { text-align: center; padding: 60px 24px 20px; max-width: 700px; margin: 0 auto; }
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--acento);
-  margin-bottom: 14px;
-}
-.encabezado h1 { font-size: 40px; font-weight: 800; color: var(--texto); letter-spacing: -0.02em; margin-bottom: 12px; }
-.subtitulo { font-size: 18px; color: var(--texto-suave); }
+.encabezado { text-align: center; padding: 48px 24px 8px; max-width: 720px; margin: 0 auto; }
+.logo-icon { font-size: 44px; display: block; margin-bottom: 8px; }
+.encabezado h1 { font-size: 32px; font-weight: 800; color: var(--texto); letter-spacing: -0.02em; margin-bottom: 8px; }
+.subtitulo { font-size: 16px; color: var(--texto-suave); }
 
-/* --- Contenedor y tarjeta --- */
-.contenedor { max-width: 700px; margin: 0 auto; padding: 20px 24px 60px; }
+/* --- Contenedor --- */
+.contenedor { max-width: 720px; margin: 0 auto; padding: 24px; }
+
+/* --- Tarjeta --- */
 .tarjeta {
   background-color: var(--tarjeta);
   border: 1px solid var(--borde);
   border-radius: 16px;
   padding: 28px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 12px 32px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--sombra);
+  margin-bottom: 24px;
 }
 
 /* --- Etiquetas y campos --- */
-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--texto);
-  margin-bottom: 8px;
-}
-
+label { display: block; font-size: 14px; font-weight: 600; color: var(--texto); margin-bottom: 8px; }
 textarea, select {
   width: 100%;
   padding: 12px 14px;
@@ -62,18 +85,19 @@ textarea, select {
   font-size: 15px;
   font-family: inherit;
   color: var(--texto);
-  background-color: #ffffff;
+  background-color: var(--input);
 }
 textarea { resize: vertical; margin-bottom: 20px; }
-textarea:focus, select:focus { outline: none; border-color: var(--acento); }
+textarea:focus, select:focus { outline: none; border-color: var(--acento); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
 
-/* --- Fila de opciones --- */
+/* --- Opciones --- */
 .opciones { display: flex; gap: 16px; margin-bottom: 24px; }
 .campo { flex: 1; }
 
-/* --- Botón --- */
-button {
-  width: 100%;
+/* --- Botones del formulario --- */
+.botones-form { display: flex; gap: 12px; }
+.btn-primario {
+  flex: 1;
   background-color: var(--acento);
   color: #ffffff;
   border: none;
@@ -85,28 +109,78 @@ button {
   font-family: inherit;
   transition: background 0.2s;
 }
-button:hover { background-color: var(--acento-oscuro); }
-
-/* --- Área de resultado --- */
-.respuesta {
-  margin-top: 24px;
-  padding: 20px;
-  background-color: var(--fondo);
+.btn-primario:hover { background-color: var(--acento-oscuro); }
+.btn-primario:disabled { opacity: 0.7; cursor: not-allowed; }
+.btn-secundario {
+  background-color: var(--tarjeta);
+  color: var(--texto-suave);
   border: 1px solid var(--borde);
+  padding: 14px 20px;
   border-radius: 10px;
   font-size: 15px;
-  color: var(--texto);
-  white-space: pre-wrap;      /* respeta los saltos de línea */
-  min-height: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
 }
-.respuesta:empty { display: none; }
+.btn-secundario:hover { border-color: var(--acento); color: var(--acento); }
+
+/* --- Tarjeta de resultado --- */
+.resultado-card { border-left: 4px solid var(--acento); }
+.resultado-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.resultado-titulo { font-size: 15px; font-weight: 700; color: var(--texto); }
+.resultado-acciones { display: flex; gap: 8px; }
+.btn-mini {
+  background-color: var(--fondo);
+  border: 1px solid var(--borde);
+  color: var(--texto);
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.btn-mini:hover { border-color: var(--acento); color: var(--acento); }
+.respuesta {
+  font-size: 15px;
+  color: var(--texto);
+  white-space: pre-wrap;      /* respeta los saltos de línea de la IA */
+  line-height: 1.7;
+  min-height: 24px;
+}
+
+/* --- Spinner de "cargando" --- */
+.cargando {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--borde);
+  border-top-color: var(--acento);
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+  vertical-align: middle;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* --- Utilidad --- */
+.oculto { display: none; }
 
 /* --- Pie --- */
-.pie { text-align: center; padding: 30px 24px; color: var(--texto-suave); font-size: 14px; }
+.pie { text-align: center; padding: 24px; color: var(--texto-suave); font-size: 14px; }
 .pie a { color: var(--acento); text-decoration: none; }
 
-/* --- Responsive --- */
+/* --- Responsive (teléfonos) --- */
 @media (max-width: 560px) {
-  .opciones { flex-direction: column; gap: 20px; }
-  .encabezado h1 { font-size: 32px; }
+  .opciones { flex-direction: column; gap: 16px; }
+  .botones-form { flex-direction: column; }
+  .encabezado h1 { font-size: 26px; }
 }

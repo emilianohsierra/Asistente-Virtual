@@ -5,28 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asistente de Soporte con IA · Emiliano H. Sierra</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 
+  <!-- Botón de modo oscuro (esquina superior derecha) -->
+  <button id="btnTema" class="btn-tema" onclick="cambiarTema()" title="Cambiar tema">🌙</button>
+
   <header class="encabezado">
-    <p class="eyebrow">Proyecto con Inteligencia Artificial</p>
-    <h1>Asistente de Respuestas de Soporte 🤖</h1>
-    <p class="subtitulo">Pega el mensaje de un cliente y genera una respuesta profesional en segundos.</p>
+    <span class="logo-icon">🤖</span>
+    <h1>Asistente de Soporte con IA</h1>
+    <p class="subtitulo">Genera respuestas profesionales para tus clientes en segundos.</p>
   </header>
 
   <main class="contenedor">
+
+    <!-- Formulario -->
     <div class="tarjeta">
-
-      <!-- 1) Mensaje del cliente -->
       <label for="mensajeCliente">Mensaje del cliente</label>
-      <textarea id="mensajeCliente" rows="5" placeholder="Ej: My flight was cancelled and nobody helped me. I want a refund now."></textarea>
+      <textarea id="mensajeCliente" rows="5" placeholder="Pega aquí el mensaje del cliente..."></textarea>
 
-      <!-- 2) Opciones -->
       <div class="opciones">
         <div class="campo">
-          <label for="idioma">Idioma de la respuesta</label>
+          <label for="idioma">Idioma</label>
           <select id="idioma">
             <option value="es">Español</option>
             <option value="en">Inglés</option>
@@ -37,17 +40,30 @@
           <select id="tono">
             <option value="Formal">Formal</option>
             <option value="Amigable">Amigable</option>
+            <option value="Empático">Empático</option>
+            <option value="Directo y conciso">Directo</option>
           </select>
         </div>
       </div>
 
-      <!-- 3) Botón -->
-      <button onclick="generarRespuesta()">Generar respuesta</button>
-
-      <!-- 4) Resultado -->
-      <div id="respuesta" class="respuesta"></div>
-
+      <div class="botones-form">
+        <button id="btnGenerar" class="btn-primario" onclick="generarRespuesta()">Generar respuesta</button>
+        <button class="btn-secundario" onclick="limpiar()">Limpiar</button>
+      </div>
     </div>
+
+    <!-- Resultado (oculto hasta que haya respuesta) -->
+    <div id="tarjetaResultado" class="tarjeta resultado-card oculto">
+      <div class="resultado-head">
+        <span class="resultado-titulo">✨ Respuesta generada</span>
+        <div class="resultado-acciones">
+          <button id="btnCopiar" class="btn-mini" onclick="copiarRespuesta()">📋 Copiar</button>
+          <button class="btn-mini" onclick="generarRespuesta()">🔄 Regenerar</button>
+        </div>
+      </div>
+      <p id="respuesta" class="respuesta"></p>
+    </div>
+
   </main>
 
   <footer class="pie">
@@ -60,16 +76,22 @@
       var idioma = document.getElementById("idioma").value;
       var tono = document.getElementById("tono").value;
       var caja = document.getElementById("respuesta");
+      var tarjeta = document.getElementById("tarjetaResultado");
+      var boton = document.getElementById("btnGenerar");
+
+      tarjeta.classList.remove("oculto");
 
       if (mensaje === "") {
         caja.textContent = "⚠️ Primero pega el mensaje del cliente.";
         return;
       }
 
-      caja.textContent = "⏳ Generando respuesta...";
+      // Estado "cargando": desactiva el botón y muestra un spinner
+      boton.disabled = true;
+      boton.textContent = "⏳ Generando...";
+      caja.innerHTML = '<span class="cargando"></span> Escribiendo respuesta...';
 
       try {
-        // Llama a nuestro backend (la función), que a su vez habla con la IA
         var res = await fetch("/.netlify/functions/generar-respuesta", {
           method: "POST",
           headers: { "content-type": "application/json" },
@@ -79,7 +101,40 @@
         caja.textContent = data.respuesta;
       } catch (error) {
         caja.textContent = "❌ Hubo un error de conexión. Intenta de nuevo.";
+      } finally {
+        boton.disabled = false;
+        boton.textContent = "Generar respuesta";
       }
+    }
+
+    function copiarRespuesta() {
+      var texto = document.getElementById("respuesta").textContent;
+      var btn = document.getElementById("btnCopiar");
+      navigator.clipboard.writeText(texto).then(function () {
+        btn.textContent = "✅ ¡Copiado!";
+        setTimeout(function () { btn.textContent = "📋 Copiar"; }, 1500);
+      });
+    }
+
+    function limpiar() {
+      document.getElementById("mensajeCliente").value = "";
+      document.getElementById("respuesta").textContent = "";
+      document.getElementById("tarjetaResultado").classList.add("oculto");
+    }
+
+    // ===== Modo oscuro =====
+    function cambiarTema() {
+      document.body.classList.toggle("tema-oscuro");
+      var oscuro = document.body.classList.contains("tema-oscuro");
+      document.getElementById("btnTema").textContent = oscuro ? "☀️" : "🌙";
+      // Recuerda la preferencia para la próxima visita
+      localStorage.setItem("tema", oscuro ? "oscuro" : "claro");
+    }
+
+    // Al cargar, aplica el tema que el usuario haya elegido antes
+    if (localStorage.getItem("tema") === "oscuro") {
+      document.body.classList.add("tema-oscuro");
+      document.getElementById("btnTema").textContent = "☀️";
     }
   </script>
 
