@@ -6,26 +6,30 @@
   <title>Asistente de Soporte con IA · Emiliano H. Sierra</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 
-  <!-- Botón de modo oscuro (esquina superior derecha) -->
-  <button id="btnTema" class="btn-tema" onclick="cambiarTema()" title="Cambiar tema">🌙</button>
+  <!-- Formas decorativas de fondo (efecto IA) -->
+  <div class="deco deco-1" aria-hidden="true"></div>
+  <div class="deco deco-2" aria-hidden="true"></div>
 
-  <header class="encabezado">
-    <span class="logo-icon">🤖</span>
-    <h1>Asistente de Soporte con IA</h1>
-    <p class="subtitulo">Genera respuestas profesionales para tus clientes en segundos.</p>
+  <!-- Botón de modo oscuro -->
+  <button id="btnTema" class="btn-tema" onclick="cambiarTema()" title="Cambiar tema" aria-label="Cambiar tema claro u oscuro">🌙</button>
+
+  <header class="hero">
+    <span class="eyebrow">✨ Impulsado por Inteligencia Artificial</span>
+    <h1>¿En qué podemos ayudarte?</h1>
+    <p class="subtitulo">Pega el mensaje de un cliente y genera una respuesta profesional al instante.</p>
   </header>
 
   <main class="contenedor">
 
-    <!-- Formulario -->
-    <div class="tarjeta">
+    <!-- Caja principal -->
+    <section class="panel">
       <label for="mensajeCliente">Mensaje del cliente</label>
-      <textarea id="mensajeCliente" rows="5" placeholder="Pega aquí el mensaje del cliente..."></textarea>
+      <textarea id="mensajeCliente" rows="5" placeholder="Escribe tu pregunta..."></textarea>
 
       <div class="opciones">
         <div class="campo">
@@ -44,16 +48,46 @@
             <option value="Directo y conciso">Directo</option>
           </select>
         </div>
+        <div class="campo">
+          <label for="longitud">Longitud</label>
+          <select id="longitud">
+            <option value="detallada">Detallada</option>
+            <option value="breve">Breve</option>
+          </select>
+        </div>
       </div>
 
       <div class="botones-form">
-        <button id="btnGenerar" class="btn-primario" onclick="generarRespuesta()">Generar respuesta</button>
+        <button id="btnGenerar" class="btn-primario" onclick="generarRespuesta()">Preguntar</button>
         <button class="btn-secundario" onclick="limpiar()">Limpiar</button>
       </div>
-    </div>
+    </section>
 
-    <!-- Resultado (oculto hasta que haya respuesta) -->
-    <div id="tarjetaResultado" class="tarjeta resultado-card oculto">
+    <!-- Ejemplos rápidos (cuadrícula) -->
+    <section class="ejemplos">
+      <h2 class="titulo-seccion">Ejemplos rápidos</h2>
+      <div class="grid-ejemplos">
+        <button class="tarjeta-ejemplo" onclick="usarEjemplo('Mi vuelo se canceló y nadie me avisó. Necesito una solución urgente.')">
+          <span class="ej-icon">✈️</span>
+          <span class="ej-texto">Vuelo cancelado</span>
+        </button>
+        <button class="tarjeta-ejemplo" onclick="usarEjemplo('Quiero solicitar el reembolso de mi compra, el producto llegó dañado.')">
+          <span class="ej-icon">💳</span>
+          <span class="ej-texto">Reembolso</span>
+        </button>
+        <button class="tarjeta-ejemplo" onclick="usarEjemplo('Llevo tres días esperando respuesta y nadie me ayuda. Estoy muy molesto.')">
+          <span class="ej-icon">😠</span>
+          <span class="ej-texto">Queja de servicio</span>
+        </button>
+        <button class="tarjeta-ejemplo" onclick="usarEjemplo('Tengo una duda sobre un cargo en mi factura que no reconozco.')">
+          <span class="ej-icon">🧾</span>
+          <span class="ej-texto">Duda de factura</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Respuesta -->
+    <section id="tarjetaResultado" class="panel resultado-card oculto" aria-live="polite">
       <div class="resultado-head">
         <span class="resultado-titulo">✨ Respuesta generada</span>
         <div class="resultado-acciones">
@@ -61,8 +95,17 @@
           <button class="btn-mini" onclick="generarRespuesta()">🔄 Regenerar</button>
         </div>
       </div>
-      <p id="respuesta" class="respuesta"></p>
-    </div>
+      <div id="respuesta" class="respuesta"></div>
+    </section>
+
+    <!-- Historial -->
+    <section id="tarjetaHistorial" class="panel historial-card oculto">
+      <div class="resultado-head">
+        <span class="resultado-titulo">📜 Historial</span>
+        <button class="btn-mini" onclick="limpiarHistorial()">🗑️ Limpiar</button>
+      </div>
+      <div id="listaHistorial" class="lista-historial"></div>
+    </section>
 
   </main>
 
@@ -71,10 +114,12 @@
   </footer>
 
   <script>
+    // ===== Generar respuesta =====
     async function generarRespuesta() {
       var mensaje = document.getElementById("mensajeCliente").value.trim();
       var idioma = document.getElementById("idioma").value;
       var tono = document.getElementById("tono").value;
+      var longitud = document.getElementById("longitud").value;
       var caja = document.getElementById("respuesta");
       var tarjeta = document.getElementById("tarjetaResultado");
       var boton = document.getElementById("btnGenerar");
@@ -82,29 +127,47 @@
       tarjeta.classList.remove("oculto");
 
       if (mensaje === "") {
-        caja.textContent = "⚠️ Primero pega el mensaje del cliente.";
+        caja.textContent = "⚠️ Primero escribe o pega el mensaje del cliente.";
         return;
       }
 
-      // Estado "cargando": desactiva el botón y muestra un spinner
       boton.disabled = true;
-      boton.textContent = "⏳ Generando...";
-      caja.innerHTML = '<span class="cargando"></span> Escribiendo respuesta...';
+      boton.textContent = "Generando...";
+      // Indicador de carga elegante (tres puntitos animados)
+      caja.innerHTML = '<span class="puntos"><span></span><span></span><span></span></span>';
 
       try {
         var res = await fetch("/.netlify/functions/generar-respuesta", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ mensaje: mensaje, idioma: idioma, tono: tono })
+          body: JSON.stringify({ mensaje: mensaje, idioma: idioma, tono: tono, longitud: longitud })
         });
         var data = await res.json();
-        caja.textContent = data.respuesta;
+        mostrarRespuesta(data.respuesta);
+        guardarEnHistorial({ respuesta: data.respuesta, idioma: idioma, tono: tono });
       } catch (error) {
         caja.textContent = "❌ Hubo un error de conexión. Intenta de nuevo.";
       } finally {
         boton.disabled = false;
-        boton.textContent = "Generar respuesta";
+        boton.textContent = "Preguntar";
       }
+    }
+
+    function mostrarRespuesta(texto) {
+      var caja = document.getElementById("respuesta");
+      caja.textContent = texto;
+      var card = document.getElementById("tarjetaResultado");
+      card.classList.remove("oculto");
+      // Reinicia la animación de aparición
+      card.classList.remove("aparece");
+      void card.offsetWidth;
+      card.classList.add("aparece");
+    }
+
+    function usarEjemplo(texto) {
+      var caja = document.getElementById("mensajeCliente");
+      caja.value = texto;
+      caja.focus();
     }
 
     function copiarRespuesta() {
@@ -122,20 +185,64 @@
       document.getElementById("tarjetaResultado").classList.add("oculto");
     }
 
+    // ===== Historial (guardado en el navegador) =====
+    function guardarEnHistorial(item) {
+      var historial = JSON.parse(localStorage.getItem("historial") || "[]");
+      historial.unshift(item);
+      if (historial.length > 20) historial = historial.slice(0, 20);
+      localStorage.setItem("historial", JSON.stringify(historial));
+      renderHistorial();
+    }
+
+    function renderHistorial() {
+      var historial = JSON.parse(localStorage.getItem("historial") || "[]");
+      var tarjeta = document.getElementById("tarjetaHistorial");
+      var lista = document.getElementById("listaHistorial");
+      lista.innerHTML = "";
+      if (historial.length === 0) { tarjeta.classList.add("oculto"); return; }
+      tarjeta.classList.remove("oculto");
+      historial.forEach(function (item, i) {
+        var fila = document.createElement("button");
+        fila.className = "historial-item";
+        fila.onclick = function () { verDelHistorial(i); };
+        var preview = document.createElement("span");
+        preview.className = "historial-preview";
+        preview.textContent = item.respuesta.slice(0, 90) + (item.respuesta.length > 90 ? "…" : "");
+        var meta = document.createElement("span");
+        meta.className = "historial-meta";
+        meta.textContent = (item.idioma === "en" ? "EN" : "ES") + " · " + item.tono;
+        fila.appendChild(preview);
+        fila.appendChild(meta);
+        lista.appendChild(fila);
+      });
+    }
+
+    function verDelHistorial(i) {
+      var historial = JSON.parse(localStorage.getItem("historial") || "[]");
+      var item = historial[i];
+      if (!item) return;
+      mostrarRespuesta(item.respuesta);
+      document.getElementById("tarjetaResultado").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function limpiarHistorial() {
+      localStorage.removeItem("historial");
+      renderHistorial();
+    }
+
     // ===== Modo oscuro =====
     function cambiarTema() {
       document.body.classList.toggle("tema-oscuro");
       var oscuro = document.body.classList.contains("tema-oscuro");
       document.getElementById("btnTema").textContent = oscuro ? "☀️" : "🌙";
-      // Recuerda la preferencia para la próxima visita
       localStorage.setItem("tema", oscuro ? "oscuro" : "claro");
     }
-
-    // Al cargar, aplica el tema que el usuario haya elegido antes
     if (localStorage.getItem("tema") === "oscuro") {
       document.body.classList.add("tema-oscuro");
       document.getElementById("btnTema").textContent = "☀️";
     }
+
+    renderHistorial();
   </script>
 
 </body>
