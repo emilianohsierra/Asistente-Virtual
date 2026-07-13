@@ -1,0 +1,4 @@
+# Configuración de Netlify para este proyecto
+[build]
+  publish = "."                    # la página está en la raíz
+  functions = "netlify/functions"  # aquí viven las funciones del backend

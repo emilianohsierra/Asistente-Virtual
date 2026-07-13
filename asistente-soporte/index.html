@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistente de Soporte con IA · Emiliano H. Sierra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+  <header class="encabezado">
+    <p class="eyebrow">Proyecto con Inteligencia Artificial</p>
+    <h1>Asistente de Respuestas de Soporte 🤖</h1>
+    <p class="subtitulo">Pega el mensaje de un cliente y genera una respuesta profesional en segundos.</p>
+  </header>
+
+  <main class="contenedor">
+    <div class="tarjeta">
+
+      <!-- 1) Mensaje del cliente -->
+      <label for="mensajeCliente">Mensaje del cliente</label>
+      <textarea id="mensajeCliente" rows="5" placeholder="Ej: My flight was cancelled and nobody helped me. I want a refund now."></textarea>
+
+      <!-- 2) Opciones -->
+      <div class="opciones">
+        <div class="campo">
+          <label for="idioma">Idioma de la respuesta</label>
+          <select id="idioma">
+            <option value="es">Español</option>
+            <option value="en">Inglés</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="tono">Tono</label>
+          <select id="tono">
+            <option value="Formal">Formal</option>
+            <option value="Amigable">Amigable</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 3) Botón -->
+      <button onclick="generarRespuesta()">Generar respuesta</button>
+
+      <!-- 4) Resultado -->
+      <div id="respuesta" class="respuesta"></div>
+
+    </div>
+  </main>
+
+  <footer class="pie">
+    <p>Proyecto de Emiliano H. Sierra · <a href="https://emilianohsierra.netlify.app" target="_blank">Volver al portafolio</a></p>
+  </footer>
+
+  <script>
+    async function generarRespuesta() {
+      var mensaje = document.getElementById("mensajeCliente").value.trim();
+      var idioma = document.getElementById("idioma").value;
+      var tono = document.getElementById("tono").value;
+      var caja = document.getElementById("respuesta");
+
+      if (mensaje === "") {
+        caja.textContent = "⚠️ Primero pega el mensaje del cliente.";
+        return;
+      }
+
+      caja.textContent = "⏳ Generando respuesta...";
+
+      try {
+        // Llama a nuestro backend (la función), que a su vez habla con la IA
+        var res = await fetch("/.netlify/functions/generar-respuesta", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ mensaje: mensaje, idioma: idioma, tono: tono })
+        });
+        var data = await res.json();
+        caja.textContent = data.respuesta;
+      } catch (error) {
+        caja.textContent = "❌ Hubo un error de conexión. Intenta de nuevo.";
+      }
+    }
+  </script>
+
+</body>
+</html>

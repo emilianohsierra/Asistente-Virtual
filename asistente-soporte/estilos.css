@@ -1,0 +1,112 @@
+/* ============================================================
+   ASISTENTE DE SOPORTE CON IA · Estilos
+   ============================================================ */
+
+:root {
+  --fondo:        #f8fafc;
+  --tarjeta:      #ffffff;
+  --texto:        #0f172a;
+  --texto-suave:  #475569;
+  --acento:       #2563eb;
+  --acento-oscuro:#1d4ed8;
+  --borde:        #e2e8f0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background-color: var(--fondo);
+  color: var(--texto-suave);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Encabezado --- */
+.encabezado { text-align: center; padding: 60px 24px 20px; max-width: 700px; margin: 0 auto; }
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--acento);
+  margin-bottom: 14px;
+}
+.encabezado h1 { font-size: 40px; font-weight: 800; color: var(--texto); letter-spacing: -0.02em; margin-bottom: 12px; }
+.subtitulo { font-size: 18px; color: var(--texto-suave); }
+
+/* --- Contenedor y tarjeta --- */
+.contenedor { max-width: 700px; margin: 0 auto; padding: 20px 24px 60px; }
+.tarjeta {
+  background-color: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
+/* --- Etiquetas y campos --- */
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texto);
+  margin-bottom: 8px;
+}
+
+textarea, select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--texto);
+  background-color: #ffffff;
+}
+textarea { resize: vertical; margin-bottom: 20px; }
+textarea:focus, select:focus { outline: none; border-color: var(--acento); }
+
+/* --- Fila de opciones --- */
+.opciones { display: flex; gap: 16px; margin-bottom: 24px; }
+.campo { flex: 1; }
+
+/* --- Botón --- */
+button {
+  width: 100%;
+  background-color: var(--acento);
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+button:hover { background-color: var(--acento-oscuro); }
+
+/* --- Área de resultado --- */
+.respuesta {
+  margin-top: 24px;
+  padding: 20px;
+  background-color: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  font-size: 15px;
+  color: var(--texto);
+  white-space: pre-wrap;      /* respeta los saltos de línea */
+  min-height: 40px;
+}
+.respuesta:empty { display: none; }
+
+/* --- Pie --- */
+.pie { text-align: center; padding: 30px 24px; color: var(--texto-suave); font-size: 14px; }
+.pie a { color: var(--acento); text-decoration: none; }
+
+/* --- Responsive --- */
+@media (max-width: 560px) {
+  .opciones { flex-direction: column; gap: 20px; }
+  .encabezado h1 { font-size: 32px; }
+}
