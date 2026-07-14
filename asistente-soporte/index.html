@@ -43,8 +43,11 @@
           <button class="chip" onclick="limpiarTexto()">🧹 Limpiar</button>
         </div>
       </div>
-      <textarea id="mensajeCliente" rows="6" maxlength="1500" oninput="actualizarContador()" placeholder="Pega aquí el mensaje del cliente...&#10;&#10;Ej: &quot;Recibí un producto dañado y nadie responde mis correos.&quot;"></textarea>
-      <div class="contador"><span id="contador">0</span> / 1500 caracteres</div>
+      <textarea id="mensajeCliente" rows="6" maxlength="1500" oninput="actualizarContador()" onkeydown="manejarEnter(event)" placeholder="Pega aquí el mensaje del cliente...&#10;&#10;Ej: &quot;Recibí un producto dañado y nadie responde mis correos.&quot;"></textarea>
+      <div class="contador">
+        <span class="pista-teclado">⏎ Enter para generar · Shift+Enter = salto de línea</span>
+        <span><span id="contador">0</span> / 1500 caracteres</span>
+      </div>
 
       <div class="opciones">
         <div class="campo">
@@ -244,6 +247,14 @@
 
     function actualizarContador() {
       document.getElementById("contador").textContent = document.getElementById("mensajeCliente").value.length;
+    }
+
+    // Enter = generar respuesta · Shift+Enter = salto de línea
+    function manejarEnter(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        generarRespuesta();
+      }
     }
 
     function usarPlantilla(texto) {
