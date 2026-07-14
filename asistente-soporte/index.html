@@ -117,6 +117,10 @@
       </div>
       <div class="divisor"></div>
       <div id="respuesta" class="respuesta"></div>
+      <div id="editorRespuesta" class="oculto">
+        <p class="editable-hint">✏️ Puedes ajustar el texto antes de copiar</p>
+        <textarea id="respuestaEditable" class="respuesta-editable" rows="4" oninput="autoAjustar(this)" aria-label="Respuesta generada, editable"></textarea>
+      </div>
     </section>
 
     <!-- Historial -->
@@ -147,6 +151,9 @@
       var boton = document.getElementById("btnGenerar");
 
       tarjeta.classList.remove("oculto");
+      // Mientras carga (o si hay un aviso) mostramos el área de mensajes y ocultamos el editor
+      caja.classList.remove("oculto");
+      document.getElementById("editorRespuesta").classList.add("oculto");
 
       if (mensaje === "") {
         caja.innerHTML = "⚠️ Primero escribe o pega el mensaje del cliente.";
@@ -195,13 +202,24 @@
     }
 
     function mostrarRespuesta(texto) {
-      var caja = document.getElementById("respuesta");
-      caja.textContent = texto;
+      // Ocultamos el área de carga/mensajes y mostramos el EDITOR con el texto
+      document.getElementById("respuesta").classList.add("oculto");
+      var editor = document.getElementById("editorRespuesta");
+      var area = document.getElementById("respuestaEditable");
+      area.value = texto;
+      editor.classList.remove("oculto");
+      autoAjustar(area);   // ajusta el alto para que se vea todo el texto
       var card = document.getElementById("tarjetaResultado");
       card.classList.remove("oculto");
       card.classList.remove("aparece");
       void card.offsetWidth;
       card.classList.add("aparece");
+    }
+
+    // Crece o encoge el editor según el contenido (sin scroll interno feo)
+    function autoAjustar(el) {
+      el.style.height = "auto";
+      el.style.height = (el.scrollHeight + 2) + "px";
     }
 
     // ===== Textarea: pegar, limpiar, contador, plantillas =====
@@ -236,7 +254,7 @@
     }
 
     function copiarRespuesta() {
-      var texto = document.getElementById("respuesta").textContent;
+      var texto = document.getElementById("respuestaEditable").value;
       var btn = document.getElementById("btnCopiar");
       navigator.clipboard.writeText(texto).then(function () {
         btn.textContent = "✅ ¡Copiado!";
