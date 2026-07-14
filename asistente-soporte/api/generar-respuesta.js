@@ -3,8 +3,10 @@
 //  Vive en /api/ y corre en el servidor de Vercel.
 //  La llave secreta se lee de una variable de entorno (segura).
 //
-//  NOTA: versión con "detector de errores" para depurar.
-//  Cuando ya funcione, la simplificamos.
+//  Hace 2 cosas:
+//   1) GENERAR: crea una respuesta nueva desde el mensaje del cliente.
+//   2) AJUSTAR (acción rápida): transforma una respuesta ya existente
+//      (más breve / más formal / más cálida / traducir).
 // ============================================================
 
 export default async function handler(req, res) {
@@ -15,25 +17,43 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1) Leer lo que mandó el frontend (Vercel ya lo convierte a objeto)
-    const { mensaje, idioma, tono, longitud } = req.body;
+    // Leer lo que mandó el frontend
+    const { mensaje, idioma, tono, longitud, accion, respuestaPrevia } = req.body;
 
-    // 1.5) DETECTOR: ¿existe la llave en las variables de entorno?
+    // ¿Existe la llave en las variables de entorno?
     const llave = process.env.ANTHROPIC_API_KEY;
     if (!llave) {
-      res.status(500).json({
-        respuesta: "🔍 DIAGNÓSTICO: La variable ANTHROPIC_API_KEY NO existe o está vacía en Vercel. Agrégala en Settings → Environment Variables y vuelve a desplegar.",
-      });
+      res.status(500).json({ respuesta: "⚠️ Falta configurar la llave de la IA en el servidor." });
       return;
     }
 
     const idiomaTexto = idioma === "en" ? "inglés" : "español";
-    const longitudTexto = longitud === "breve"
-      ? "breve y directa (2 a 4 oraciones)"
-      : "completa y bien desarrollada";
 
-    // 2) Armar la instrucción (el "prompt") para la IA
-    const prompt = `Eres un agente de soporte al cliente profesional y empático.
+    // Construimos el "prompt" según lo que pidió el frontend
+    let prompt;
+
+    if (accion && respuestaPrevia) {
+      // ---- MODO ACCIÓN RÁPIDA: transformar una respuesta existente ----
+      const instrucciones = {
+        breve: "Acorta la siguiente respuesta de atención al cliente para que sea más breve y directa (2 a 4 oraciones), conservando el mismo idioma y lo esencial.",
+        formal: "Reescribe la siguiente respuesta de atención al cliente para que suene más formal y profesional, sin cambiar el idioma ni el significado.",
+        calida: "Reescribe la siguiente respuesta de atención al cliente para que suene más cálida, cercana y empática, sin cambiar el idioma ni el significado.",
+        traducir: "Traduce la siguiente respuesta de atención al cliente al inglés si está en español, o al español si está en inglés.",
+      };
+      const instr = instrucciones[accion] || instrucciones.formal;
+      prompt = `${instr}
+Responde SOLO con el texto resultante, sin encabezados ni comillas.
+
+Respuesta:
+"""
+${respuestaPrevia}
+"""`;
+    } else {
+      // ---- MODO NORMAL: generar una respuesta nueva ----
+      const longitudTexto = longitud === "breve"
+        ? "breve y directa (2 a 4 oraciones)"
+        : "completa y bien desarrollada";
+      prompt = `Eres un agente de soporte al cliente profesional y empático.
 Redacta una respuesta ${longitudTexto}, con tono ${tono}, escrita en ${idiomaTexto}, para el mensaje de un cliente.
 Sé claro, resuelve o encamina el problema, y mantén un trato humano.
 Responde SOLO con el texto de la respuesta, sin encabezados como "Respuesta:".
@@ -42,8 +62,9 @@ Mensaje del cliente:
 """
 ${mensaje}
 """`;
+    }
 
-    // 3) Llamar a la API de Claude (la llave vive en Vercel, escondida)
+    // Llamar a la API de Claude (la llave vive en Vercel, escondida)
     const respuestaAPI = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -58,24 +79,15 @@ ${mensaje}
       }),
     });
 
-    // 3.5) DETECTOR: ¿la API de Claude respondió con error?
     if (!respuestaAPI.ok) {
-      const errorTexto = await respuestaAPI.text();
-      res.status(500).json({
-        respuesta: `🔍 DIAGNÓSTICO: Claude respondió con error ${respuestaAPI.status}. Detalle: ${errorTexto.slice(0, 300)}`,
-      });
+      res.status(500).json({ respuesta: "❌ La IA devolvió un error. Intenta de nuevo en un momento." });
       return;
     }
 
-    // 4) Sacar el texto y devolverlo al frontend
     const data = await respuestaAPI.json();
     const texto = data.content[0].text;
-
     res.status(200).json({ respuesta: texto });
   } catch (error) {
-    // DETECTOR: mostrar el mensaje real del error para depurar
-    res.status(500).json({
-      respuesta: `🔍 DIAGNÓSTICO (excepción): ${error.message}`,
-    });
+    res.status(500).json({ respuesta: "❌ Error al generar la respuesta. Intenta de nuevo." });
   }
 }

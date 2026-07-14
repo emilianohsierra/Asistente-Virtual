@@ -124,6 +124,13 @@
         <p class="editable-hint">✏️ Puedes ajustar el texto antes de copiar</p>
         <textarea id="respuestaEditable" class="respuesta-editable" rows="4" oninput="autoAjustar(this)" aria-label="Respuesta generada, editable"></textarea>
       </div>
+      <div id="accionesRapidas" class="acciones-rapidas oculto">
+        <span class="ar-label">⚡ Ajustar:</span>
+        <button class="chip-accion" onclick="accionRapida('breve')">✂️ Más breve</button>
+        <button class="chip-accion" onclick="accionRapida('formal')">🎩 Más formal</button>
+        <button class="chip-accion" onclick="accionRapida('calida')">💗 Más cálida</button>
+        <button class="chip-accion" onclick="accionRapida('traducir')">🌐 Traducir</button>
+      </div>
     </section>
 
     <!-- Historial -->
@@ -157,6 +164,8 @@
       // Mientras carga (o si hay un aviso) mostramos el área de mensajes y ocultamos el editor
       caja.classList.remove("oculto");
       document.getElementById("editorRespuesta").classList.add("oculto");
+      var accsOcultar = document.getElementById("accionesRapidas");
+      if (accsOcultar) accsOcultar.classList.add("oculto");
 
       if (mensaje === "") {
         caja.innerHTML = "⚠️ Primero escribe o pega el mensaje del cliente.";
@@ -212,6 +221,8 @@
       area.value = texto;
       editor.classList.remove("oculto");
       autoAjustar(area);   // ajusta el alto para que se vea todo el texto
+      var acciones = document.getElementById("accionesRapidas");
+      if (acciones) acciones.classList.remove("oculto");   // mostrar botones de ajuste
       var card = document.getElementById("tarjetaResultado");
       card.classList.remove("oculto");
       card.classList.remove("aparece");
@@ -223,6 +234,40 @@
     function autoAjustar(el) {
       el.style.height = "auto";
       el.style.height = (el.scrollHeight + 2) + "px";
+    }
+
+    // ===== Acción rápida: transforma la respuesta ACTUAL (más breve/formal/cálida/traducir) =====
+    async function accionRapida(accion) {
+      var area = document.getElementById("respuestaEditable");
+      var textoActual = area.value.trim();
+      if (textoActual === "") return;   // no hay nada que ajustar
+
+      var idioma = document.getElementById("idioma").value;
+      var contenedor = document.getElementById("accionesRapidas");
+      var original = area.value;
+
+      // Estado de carga: deshabilitar botones y avisar dentro del editor
+      if (contenedor) contenedor.classList.add("cargando");
+      area.disabled = true;
+      area.value = "⏳ Ajustando la respuesta...";
+
+      try {
+        var res = await fetch("/api/generar-respuesta", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          // Mandamos la respuesta ACTUAL (ya editada) + la acción, NO el mensaje original
+          body: JSON.stringify({ accion: accion, respuestaPrevia: textoActual, idioma: idioma })
+        });
+        var data = await res.json();
+        area.disabled = false;
+        mostrarRespuesta(data.respuesta);
+      } catch (error) {
+        area.disabled = false;
+        area.value = original;   // si falla, devolvemos el texto que tenías
+        alert("Hubo un error de conexión. Intenta de nuevo.");
+      } finally {
+        if (contenedor) contenedor.classList.remove("cargando");
+      }
     }
 
     // ===== Textarea: pegar, limpiar, contador, plantillas =====
