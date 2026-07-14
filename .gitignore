@@ -1,0 +1,4 @@
+# Basura del sistema y del editor
+Thumbs.db
+.DS_Store
+.vscode/
