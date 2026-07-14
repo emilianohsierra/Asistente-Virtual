@@ -280,6 +280,20 @@ textarea:focus, select:focus { outline: none; border-color: var(--violeta); box-
 }
 .btn-limpiar-hist:hover { border-color: var(--violeta); color: var(--violeta); }
 
+/* --- Vista conversacional / burbujas de chat (Ronda 3 · paso 2) --- */
+.chat-msg { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; }
+.chat-msg:last-child { margin-bottom: 0; }
+.chat-avatar {
+  flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  border: 1px solid var(--borde); background: var(--input);
+}
+.chat-msg.ia .chat-avatar { background: var(--grad); border: none; }
+.chat-burbuja { flex: 1; min-width: 0; border: 1px solid var(--borde); border-radius: 14px; padding: 12px 15px; background: var(--input); }
+.chat-msg.ia .chat-burbuja { background: var(--grad-suave); border-color: var(--panel-bord); }
+.chat-rol { display: block; font-size: 11px; font-weight: 700; color: var(--tenue); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.6px; }
+.chat-texto { font-size: 15px; color: var(--texto); white-space: pre-wrap; line-height: 1.6; }
+
 /* --- Utilidad --- */
 .oculto { display: none; }
 

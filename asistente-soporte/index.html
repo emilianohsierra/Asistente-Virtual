@@ -143,24 +143,41 @@
     <!-- Respuesta -->
     <section id="tarjetaResultado" class="panel resultado-card oculto" aria-live="polite">
       <div class="resultado-head">
-        <span class="resultado-titulo">✨ Respuesta generada</span>
+        <span class="resultado-titulo">💬 Conversación</span>
         <div class="resultado-acciones">
           <button id="btnCopiar" class="btn-mini" onclick="copiarRespuesta()">📋 Copiar</button>
           <button class="btn-mini" onclick="generarRespuesta()">🔄 Regenerar</button>
         </div>
       </div>
       <div class="divisor"></div>
-      <div id="respuesta" class="respuesta"></div>
-      <div id="editorRespuesta" class="oculto">
-        <p class="editable-hint">✏️ Puedes ajustar el texto antes de copiar</p>
-        <textarea id="respuestaEditable" class="respuesta-editable" rows="4" oninput="autoAjustar(this)" aria-label="Respuesta generada, editable"></textarea>
+
+      <!-- Burbuja: mensaje del cliente -->
+      <div id="burbujaCliente" class="chat-msg cliente oculto">
+        <span class="chat-avatar">👤</span>
+        <div class="chat-burbuja">
+          <span class="chat-rol">Cliente</span>
+          <p id="textoCliente" class="chat-texto"></p>
+        </div>
       </div>
-      <div id="accionesRapidas" class="acciones-rapidas oculto">
-        <span class="ar-label">⚡ Ajustar:</span>
-        <button class="chip-accion" onclick="accionRapida('breve')">✂️ Más breve</button>
-        <button class="chip-accion" onclick="accionRapida('formal')">🎩 Más formal</button>
-        <button class="chip-accion" onclick="accionRapida('calida')">💗 Más cálida</button>
-        <button class="chip-accion" onclick="accionRapida('traducir')">🌐 Traducir</button>
+
+      <!-- Burbuja: respuesta del asistente (carga / editor / acciones) -->
+      <div class="chat-msg ia">
+        <span class="chat-avatar">✨</span>
+        <div class="chat-burbuja">
+          <span class="chat-rol">Asistente</span>
+          <div id="respuesta" class="respuesta"></div>
+          <div id="editorRespuesta" class="oculto">
+            <textarea id="respuestaEditable" class="respuesta-editable" rows="4" oninput="autoAjustar(this)" aria-label="Respuesta generada, editable"></textarea>
+            <p class="editable-hint">✏️ Puedes ajustar el texto antes de copiar</p>
+          </div>
+          <div id="accionesRapidas" class="acciones-rapidas oculto">
+            <span class="ar-label">⚡ Ajustar:</span>
+            <button class="chip-accion" onclick="accionRapida('breve')">✂️ Más breve</button>
+            <button class="chip-accion" onclick="accionRapida('formal')">🎩 Más formal</button>
+            <button class="chip-accion" onclick="accionRapida('calida')">💗 Más cálida</button>
+            <button class="chip-accion" onclick="accionRapida('traducir')">🌐 Traducir</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -198,6 +215,10 @@
         caja.innerHTML = "⚠️ Primero escribe o pega el mensaje del cliente.";
         return;
       }
+
+      // Mostrar el mensaje del cliente como burbuja de chat
+      document.getElementById("textoCliente").textContent = mensaje;
+      document.getElementById("burbujaCliente").classList.remove("oculto");
 
       boton.disabled = true;
       boton.textContent = "Generando...";
@@ -389,6 +410,8 @@
       var historial = JSON.parse(localStorage.getItem("historial") || "[]");
       var item = historial[i];
       if (!item) return;
+      document.getElementById("textoCliente").textContent = item.mensaje || "";
+      document.getElementById("burbujaCliente").classList.toggle("oculto", !item.mensaje);
       mostrarRespuesta(item.respuesta);
       cerrarHistorial();
       document.getElementById("tarjetaResultado").scrollIntoView({ behavior: "smooth" });
