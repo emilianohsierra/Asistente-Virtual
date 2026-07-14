@@ -203,6 +203,13 @@ textarea:focus, select:focus { outline: none; border-color: var(--violeta); box-
 .ar-label { font-size: 12.5px; color: var(--tenue); font-weight: 600; margin-right: 2px; }
 .chip-accion { background: var(--input); color: var(--texto); border: 1px solid var(--borde); border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: border-color 0.2s, color 0.2s; }
 .chip-accion:hover { border-color: var(--violeta); color: var(--violeta); }
+/* --- Modo profesional / firma (Ronda 2 · función 3) --- */
+.modo-pro { margin-bottom: 20px; }
+.switch-label { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--texto); cursor: pointer; }
+.switch-label input { width: auto; cursor: pointer; }
+.campos-pro { display: flex; gap: 14px; margin-top: 12px; }
+.campos-pro input[type="text"] { width: 100%; padding: 12px 14px; border: 1px solid var(--borde); border-radius: 12px; font-size: 14px; font-family: inherit; color: var(--texto); background-color: var(--input); transition: border-color 0.2s, box-shadow 0.2s; }
+.campos-pro input[type="text"]:focus { outline: none; border-color: var(--violeta); box-shadow: var(--anillo); }
 
 /* Animación de aparición */
 .aparece { animation: aparecer 0.45s ease; }

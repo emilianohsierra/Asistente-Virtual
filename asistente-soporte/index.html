@@ -75,6 +75,22 @@
         </div>
       </div>
 
+      <div class="modo-pro">
+        <label class="switch-label">
+          <input type="checkbox" id="modoPro" onchange="toggleModoPro()"> 🎛️ Modo profesional (agrega firma)
+        </label>
+        <div id="camposPro" class="campos-pro oculto">
+          <div class="campo">
+            <label for="agente">👤 Tu nombre</label>
+            <input type="text" id="agente" maxlength="40" oninput="saveModoPro()" placeholder="Ej: Emiliano H. Sierra">
+          </div>
+          <div class="campo">
+            <label for="empresa">🏢 Empresa</label>
+            <input type="text" id="empresa" maxlength="40" oninput="saveModoPro()" placeholder="Ej: AI Reply">
+          </div>
+        </div>
+      </div>
+
       <button id="btnGenerar" class="btn-primario" onclick="generarRespuesta()">✨ Generar respuesta</button>
     </section>
 
@@ -156,6 +172,9 @@
       var idioma = document.getElementById("idioma").value;
       var tono = document.getElementById("tono").value;
       var longitud = document.getElementById("longitud").value;
+      var modoPro = document.getElementById("modoPro").checked;
+      var agente = modoPro ? document.getElementById("agente").value.trim() : "";
+      var empresa = modoPro ? document.getElementById("empresa").value.trim() : "";
       var caja = document.getElementById("respuesta");
       var tarjeta = document.getElementById("tarjetaResultado");
       var boton = document.getElementById("btnGenerar");
@@ -200,7 +219,7 @@
         var res = await fetch("/api/generar-respuesta", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ mensaje: mensaje, idioma: idioma, tono: tono, longitud: longitud })
+          body: JSON.stringify({ mensaje: mensaje, idioma: idioma, tono: tono, longitud: longitud, agente: agente, empresa: empresa })
         });
         var data = await res.json();
         mostrarRespuesta(data.respuesta);
@@ -381,6 +400,29 @@
       document.body.classList.add("tema-oscuro");
       document.getElementById("btnTema").textContent = "☀️";
     }
+
+    // ===== Modo profesional (firma) =====
+    function toggleModoPro() {
+      var on = document.getElementById("modoPro").checked;
+      document.getElementById("camposPro").classList.toggle("oculto", !on);
+      saveModoPro();
+    }
+    function saveModoPro() {
+      localStorage.setItem("modoPro", JSON.stringify({
+        on: document.getElementById("modoPro").checked,
+        agente: document.getElementById("agente").value,
+        empresa: document.getElementById("empresa").value
+      }));
+    }
+    // Restaurar lo que el usuario guardó antes (nombre/empresa/interruptor)
+    (function restaurarModoPro() {
+      var pro = JSON.parse(localStorage.getItem("modoPro") || "null");
+      if (!pro) return;
+      document.getElementById("modoPro").checked = !!pro.on;
+      document.getElementById("agente").value = pro.agente || "";
+      document.getElementById("empresa").value = pro.empresa || "";
+      toggleModoPro();
+    })();
 
     renderHistorial();
   </script>

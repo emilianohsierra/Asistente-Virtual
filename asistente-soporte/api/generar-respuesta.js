@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
   try {
     // Leer lo que mandó el frontend
-    const { mensaje, idioma, tono, longitud, accion, respuestaPrevia } = req.body;
+    const { mensaje, idioma, tono, longitud, accion, respuestaPrevia, agente, empresa } = req.body;
 
     // ¿Existe la llave en las variables de entorno?
     const llave = process.env.ANTHROPIC_API_KEY;
@@ -53,10 +53,18 @@ ${respuestaPrevia}
       const longitudTexto = longitud === "breve"
         ? "breve y directa (2 a 4 oraciones)"
         : "completa y bien desarrollada";
+
+      // Modo profesional: si mandaron nombre y/o empresa, pedimos una firma al final
+      let firma = "";
+      if (agente || empresa) {
+        const quien = [agente, empresa].filter(Boolean).join(" — ");
+        firma = `\nTermina con una despedida profesional y una firma (en el mismo idioma de la respuesta) usando: ${quien}.`;
+      }
+
       prompt = `Eres un agente de soporte al cliente profesional y empático.
 Redacta una respuesta ${longitudTexto}, con tono ${tono}, escrita en ${idiomaTexto}, para el mensaje de un cliente.
 Sé claro, resuelve o encamina el problema, y mantén un trato humano.
-Responde SOLO con el texto de la respuesta, sin encabezados como "Respuesta:".
+Responde SOLO con el texto de la respuesta, sin encabezados como "Respuesta:".${firma}
 
 Mensaje del cliente:
 """
