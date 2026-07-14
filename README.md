@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <a href="https://asistente-virtual-livid.vercel.app"><b>Live Demo →</b></a>
+  <a href="https://asistente-ia-emiliano.vercel.app"><b>Live Demo →</b></a>
 </p>
 
 ---
