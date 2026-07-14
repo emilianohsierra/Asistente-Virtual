@@ -17,9 +17,24 @@
 
   <!-- Barra superior con marca -->
   <nav class="topbar">
-    <span class="marca">✨ AI Reply</span>
+    <div class="topbar-left">
+      <button id="btnHistorial" class="btn-icono" onclick="abrirHistorial()" title="Historial" aria-label="Abrir historial">🗂️</button>
+      <span class="marca">✨ AI Reply</span>
+    </div>
     <button id="btnTema" class="btn-tema" onclick="cambiarTema()" title="Cambiar tema" aria-label="Cambiar tema claro u oscuro">🌙</button>
   </nav>
+
+  <!-- Barra lateral de historial (Ronda 3 · paso 1) -->
+  <div id="overlayHist" class="overlay-hist oculto" onclick="cerrarHistorial()"></div>
+  <aside id="sidebarHist" class="sidebar-hist">
+    <div class="sidebar-hist-head">
+      <span class="sidebar-hist-titulo">🗂️ Historial</span>
+      <button class="btn-cerrar" onclick="cerrarHistorial()" aria-label="Cerrar historial">✕</button>
+    </div>
+    <button class="btn-nueva" onclick="nuevaRespuesta()">➕ Nueva respuesta</button>
+    <div id="listaHistorial" class="lista-historial"></div>
+    <button class="btn-limpiar-hist" onclick="limpiarHistorial()">🗑️ Limpiar historial</button>
+  </aside>
 
   <header class="hero">
     <span class="eyebrow">✨ Asistente IA para Atención al Cliente</span>
@@ -149,14 +164,7 @@
       </div>
     </section>
 
-    <!-- Historial -->
-    <section id="tarjetaHistorial" class="panel historial-card oculto">
-      <div class="resultado-head">
-        <span class="resultado-titulo">📜 Historial</span>
-        <button class="btn-mini" onclick="limpiarHistorial()">🗑️ Limpiar</button>
-      </div>
-      <div id="listaHistorial" class="lista-historial"></div>
-    </section>
+    <!-- (El historial ahora vive en la barra lateral izquierda 🗂️) -->
 
   </main>
 
@@ -355,11 +363,12 @@
 
     function renderHistorial() {
       var historial = JSON.parse(localStorage.getItem("historial") || "[]");
-      var tarjeta = document.getElementById("tarjetaHistorial");
       var lista = document.getElementById("listaHistorial");
       lista.innerHTML = "";
-      if (historial.length === 0) { tarjeta.classList.add("oculto"); return; }
-      tarjeta.classList.remove("oculto");
+      if (historial.length === 0) {
+        lista.innerHTML = '<p class="hist-vacio">Aún no hay respuestas guardadas.</p>';
+        return;
+      }
       historial.forEach(function (item, i) {
         var fila = document.createElement("button");
         fila.className = "historial-item";
@@ -381,12 +390,30 @@
       var item = historial[i];
       if (!item) return;
       mostrarRespuesta(item.respuesta);
+      cerrarHistorial();
       document.getElementById("tarjetaResultado").scrollIntoView({ behavior: "smooth" });
     }
 
     function limpiarHistorial() {
       localStorage.removeItem("historial");
       renderHistorial();
+    }
+
+    // ===== Barra lateral de historial (Ronda 3 · paso 1) =====
+    function abrirHistorial() {
+      document.getElementById("sidebarHist").classList.add("abierto");
+      document.getElementById("overlayHist").classList.remove("oculto");
+    }
+    function cerrarHistorial() {
+      document.getElementById("sidebarHist").classList.remove("abierto");
+      document.getElementById("overlayHist").classList.add("oculto");
+    }
+    function nuevaRespuesta() {
+      document.getElementById("mensajeCliente").value = "";
+      actualizarContador();
+      document.getElementById("tarjetaResultado").classList.add("oculto");
+      cerrarHistorial();
+      document.getElementById("mensajeCliente").focus();
     }
 
     // ===== Modo oscuro =====
